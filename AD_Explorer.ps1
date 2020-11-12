@@ -1,10 +1,3 @@
-<# ---------- A FAZER / CORRIGIR ----------
-
-#Start-Export sendo executado na function txt, mesmo se houver um erro antes.
-#Verificar linha 331
-
-#>
-
 $ErrorActionPreference = "SilentlyContinue"
 
 function txt {
