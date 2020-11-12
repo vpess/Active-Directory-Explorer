@@ -1,3 +1,10 @@
+<# ---------- A FAZER / CORRIGIR ----------
+
+#Start-Export sendo executado na function txt, mesmo se houver um erro antes.
+#Verificar linha 331
+
+#>
+
 $ErrorActionPreference = "SilentlyContinue"
 
 function txt {
@@ -312,7 +319,7 @@ $LabelUser.location              = New-Object System.Drawing.Point(26,159)
 $LabelUser.Font                  = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $LabelInfo                       = New-Object system.Windows.Forms.Label
-$LabelInfo.text                  = "Este programa realiza a busca apenas de grupos e usuários do domínio petrobras.biz.`nOs arquivos de relatório são salvos na pasta Documentos/Documents."
+$LabelInfo.text                  = "Este programa realiza a busca apenas de grupos e usuários do domínio petrobras.biz.`nOs arquivos de relatório são salvos na pasta Documentos (ou Documents)."
 $LabelInfo.AutoSize              = $true
 $LabelInfo.width                 = 25
 $LabelInfo.height                = 10
@@ -373,7 +380,7 @@ $ButtonConfirm.Add_Click({
 
 $AboutStripMenuItem.Add_Click({
     $sobre = New-Object -ComObject Wscript.Shell
-    $sobre.Popup("Versão: 2.0`nGerência: TIC/OI/OS/CSERV`nDesenvolvido por: BJBD",0,"Sobre AD Explorer",0x0)
+    $sobre.Popup("Versão: 2.0`nDesenvolvido por: github.com/vpessanha",0,"Sobre AD Explorer",0x0)
 })
 
 
