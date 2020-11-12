@@ -14,7 +14,7 @@ Permite a visualização dos dados de forma mais simples, além da emissão de u
 
 
 
-Ferramentas utilizadas:
+Ferramentas utilizadas no desenvolvimento:
 
 PoshGUI
 
