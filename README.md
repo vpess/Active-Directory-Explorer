@@ -2,7 +2,7 @@
 
 Simple Powershell/Forms program for Active Directory search.
 
-Grants an easier and complete visualization of Active Directory access groups, including a report of those groups.
+Grants an easier and complete visualization of Active Directory access groups, allowing the user to export an report of those accesses.
 
 Written with PoshGUI and Visual Studio Code.
 
