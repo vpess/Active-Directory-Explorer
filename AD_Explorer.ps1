@@ -2,12 +2,13 @@ $ErrorActionPreference = "SilentlyContinue"
 
 function txt {
     $user = $TextBoxID.text
-    $username = Get-ADUser $user -Properties Name, DisplayName -ErrorVariable erro2 | Select-Object Name, Displayname
     $file = (Get-ADUser $user -Properties MemberOf -ErrorVariable erro2).MemberOf | Get-ADGroup -Properties Name, Description | Select-Object Name, Description
+    $username = Get-ADUser $user -Properties Name, DisplayName | Select-Object Name, Displayname
 
     if ($erro2) {
-        $warning_ad = New-Object -ComObject Wscript.Shell
-        $warning_ad.Popup("Chave não encontrada no domínio.",0,"Aviso de AD Explorer",0x0)
+        $LabelError.Visible = $true
+        Start-Sleep -s 2
+        $LabelError.Visible = $false
     }
     
     else { 
@@ -22,6 +23,7 @@ function txt {
             Start-Sleep -s 1 }  
         }
         do {Start-Export} while (txt_data)
+        $LabelProcessing.Visible = $false
 }
 
 function grid {
@@ -29,18 +31,21 @@ function grid {
     $user = $TextBoxID.text
     $date = get-date -format "dddd, dd/MM/yyyy, HH:mm:ss"
     $file = (Get-ADUser $user -Properties MemberOf -ErrorVariable erro2).MemberOf | Get-ADGroup -Properties Name, Description | Select-Object Name, Description
+    $username = (Get-ADUser $user -Properties Name, DisplayName).DisplayName
 
     if ($erro2) {
-        $warning_ad = New-Object -ComObject Wscript.Shell
-        $warning_ad.Popup("Chave não encontrada no domínio.",0,"Aviso de AD Explorer",0x0)
+        $LabelError.Visible = $true
+        Start-Sleep -s 2
+        $LabelError.Visible = $false
     }
     
     else {
         function grid_data {
-            $file | Out-gridview -Title "Grupos de Acesso de $user - $date"
+            $file | Out-gridview -Title "Grupos de Acesso de $user ($username) -> $date"
             Start-Sleep -s 1
         }
         do {Start-Export} while (grid_data)
+        $LabelProcessing.Visible = $false
     }
 }
 
@@ -105,8 +110,9 @@ function csv {
     $file = (Get-ADUser $user -Properties MemberOf -ErrorVariable erro2).MemberOf | Get-ADGroup -Properties Name, Description | Select-Object Name, Description
 
     if ($erro2) {
-        $warning_ad = New-Object -ComObject Wscript.Shell
-        $warning_ad.Popup("Chave não encontrada no domínio.",0,"Aviso de AD Explorer",0x0)
+        $LabelError.Visible = $true
+        Start-Sleep -s 2
+        $LabelError.Visible = $false
     }
 
     else {
@@ -120,41 +126,20 @@ function csv {
         Start-Sleep -s 1
         }
         do {Start-Export} while (csv_data)
+        $LabelProcessing.Visible = $false
     }
     
 }
 
 
 ############################################# 
-#GUI
+#                   GUI
 ############################################
 
 function Start-Export {
-    
-    Add-Type -AssemblyName System.Windows.Forms    
- 
-     $FormProgram                  = New-Object System.Windows.Forms.Form
-     $FormProgram.Text             = "Mensagem de AD Explorer"
-     $FormProgram.Size             = New-Object System.Drawing.Size(280,85)
-     $FormProgram.StartPosition    = 'CenterScreen'
-     $FormProgram.MaximizeBox      = $false
-     $FormProgram.MinimizeBox      = $false
-     $FormProgram.CloseBox         = $false
-     $FormProgram.TopMost          = $false
- 
-     $Labelmsg                     = New-Object System.Windows.Forms.Label
-     $Labelmsg.Location            = New-Object System.Drawing.Size(25,10) 
-     $Labelmsg.width               = 25
-     $Labelmsg.height              = 10
-     $Labelmsg.Autosize            = $true
-     $Labelmsg.Text                = "Gerando visualização de dados. Aguarde..."
-     $FormProgram.Controls.Add($Labelmsg)
- 
-     $FormProgram.Show()| Out-Null
- 
-     Start-Sleep -Seconds 10
- 
-     $FormProgram.Close() | Out-Null
+    $LabelError.Visible = $false
+    $LabelProcessing.Visible = $true
+    Start-Sleep -s 3
 }
 
 function Start-AD {
@@ -259,14 +244,14 @@ $GroupboxAction                  = New-Object system.Windows.Forms.Groupbox
 $GroupboxAction.height           = 121
 $GroupboxAction.width            = 183
 $GroupboxAction.text             = "Exporte em"
-$GroupboxAction.location         = New-Object System.Drawing.Point(201,137)
+$GroupboxAction.location         = New-Object System.Drawing.Point(201,125)
 
 $TextBoxID                       = New-Object system.Windows.Forms.TextBox
 $TextBoxID.TabIndex              = 0
 $TextBoxID.multiline             = $false
 $TextBoxID.width                 = 86
 $TextBoxID.height                = 20
-$TextBoxID.location              = New-Object System.Drawing.Point(61,193)
+$TextBoxID.location              = New-Object System.Drawing.Point(61,180)
 $TextBoxID.Font                  = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 $TextBoxID.text                  = $user
 $FormAdExplorer.Controls.Add($TextBoxID)
@@ -300,7 +285,7 @@ $LabelExplorer.text              = "AD EXPLORER"
 $LabelExplorer.AutoSize          = $true
 $LabelExplorer.width             = 25
 $LabelExplorer.height            = 10
-$LabelExplorer.location          = New-Object System.Drawing.Point(211,33)
+$LabelExplorer.location          = New-Object System.Drawing.Point(211,30)
 $LabelExplorer.Font              = New-Object System.Drawing.Font('Microsoft YaHei UI',12)
 
 $LabelUser                       = New-Object system.Windows.Forms.Label
@@ -308,16 +293,35 @@ $LabelUser.text                  = "Digite a chave do usuário"
 $LabelUser.AutoSize              = $true
 $LabelUser.width                 = 25
 $LabelUser.height                = 10
-$LabelUser.location              = New-Object System.Drawing.Point(26,159)
+$LabelUser.location              = New-Object System.Drawing.Point(26,150)
 $LabelUser.Font                  = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $LabelInfo                       = New-Object system.Windows.Forms.Label
-$LabelInfo.text                  = "Este programa realiza a busca apenas de grupos e usuários do domínio petrobras.biz.`nOs arquivos de relatório são salvos na pasta Documentos (ou Documents)."
+$LabelInfo.text                  = "Este programa realiza a busca apenas de grupos e usuários do domínio local.`nOs arquivos de relatório são salvos na pasta Documentos (ou Documents)."
 $LabelInfo.AutoSize              = $true
 $LabelInfo.width                 = 25
 $LabelInfo.height                = 10
-$LabelInfo.location              = New-Object System.Drawing.Point(17,81)
+$LabelInfo.location              = New-Object System.Drawing.Point(45,65)
 $LabelInfo.Font                  = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+
+$LabelProcessing                 = New-Object system.Windows.Forms.Label
+$LabelProcessing.text            = "Gerando visualização de dados. Aguarde..."
+$LabelProcessing.AutoSize        = $true
+$LabelProcessing.width           = 25
+$LabelProcessing.height          = 10
+$LabelProcessing.location        = New-Object System.Drawing.Point(134,255)
+$LabelProcessing.Font            = New-Object System.Drawing.Font('Microsoft Sans Serif',10,[System.Drawing.FontStyle]([System.Drawing.FontStyle]::Bold))
+$LabelProcessing.ForeColor       = [System.Drawing.ColorTranslator]::FromHtml("#0c5151")
+
+
+$LabelError                      = New-Object system.Windows.Forms.Label
+$LabelError.text                 = "Usuário não encontrado no domínio."
+$LabelError.AutoSize             = $true
+$LabelError.width                = 25
+$LabelError.height               = 10
+$LabelError.location             = New-Object System.Drawing.Point(134,255)
+$LabelError.Font                 = New-Object System.Drawing.Font('Microsoft Sans Serif',10,[System.Drawing.FontStyle]([System.Drawing.FontStyle]::Bold -bor [System.Drawing.FontStyle]::Underline))
+$LabelError.ForeColor            = [System.Drawing.ColorTranslator]::FromHtml("#cb0909")
 
 $MainStripMenu = New-Object System.Windows.Forms.MenuStrip
 $MainStripMenu.BackColor = [System.Drawing.ColorTranslator]::FromHtml("#c0c0c0")
@@ -328,22 +332,12 @@ $AboutStripMenuItem.Size        = New-Object System.Drawing.Size(51, 20)
 $AboutStripMenuItem.Text        = "Sobre"
 
 $MainStripMenu.Items.AddRange(@($AboutStripMenuItem))
-$FormAdExplorer.controls.AddRange(@($ButtonQuit,$ButtonConfirm,$GroupboxAction,$TextBoxID,$LabelExplorer,$LabelUser,$LabelInfo, $MainStripMenu))
+$FormAdExplorer.controls.AddRange(@($ButtonQuit,$ButtonConfirm,$GroupboxAction,$TextBoxID,$LabelExplorer,$LabelUser,$LabelInfo, $LabelProcessing, $LabelError, $MainStripMenu))
 $GroupboxAction.controls.AddRange(@($RadioButtonTxt,$RadioButtonCsv,$RadioButtonGrid))
 
-<#$TextBoxID.Add_Shown({
-if ($TextBoxID.text -eq ""){
-    Do {
-        $GroupboxAction.Enabled = $False
-        $ButtonConfirm.Enabled = $False
-    } while ($TextBoxID.text -eq "")    
-}
+$LabelProcessing.Visible = $false
+$LabelError.Visible = $false
 
-<#else {
-    $GroupboxAction.Enabled = $true
-    $ButtonConfirm.Enabled = $true
-}
-})#>
 
 $FormAdExplorer.Add_Shown({
     $FormAdExplorer.Activate()
@@ -373,7 +367,7 @@ $ButtonConfirm.Add_Click({
 
 $AboutStripMenuItem.Add_Click({
     $sobre = New-Object -ComObject Wscript.Shell
-    $sobre.Popup("Versão: 2.0`nDesenvolvido por: github.com/vpessanha",0,"Sobre AD Explorer",0x0)
+    $sobre.Popup("Versão: 2.1`nDesenvolvido por: github.com/vpessanha",0,"Sobre AD Explorer",0x0)
 })
 
 
@@ -392,24 +386,16 @@ function HideConsole {
 
 function AD_Explorer {
 
-Import-Module ActiveDirectory -ErrorVariable erro
-
-if ($erro -eq $true){
-    $warning_net = New-Object -ComObject Wscript.Shell
-    $warning_net.Popup("Verifique a conexão com a rede e tente novamente.",0,"Aviso!",0x0)
-}
-
-else {
+if (Get-Module -ListAvailable -Name ActiveDirectory) {
+    Import-Module ActiveDirectory
     do {Start-AD} until (Import-Module ActiveDirectory == $true)
     $MainStripMenu.ShowDialog()
     $FormAdExplorer.ShowDialog()
     $GroupboxAction.ShowDialog()
 } 
+else {
+    $warning_net = New-Object -ComObject Wscript.Shell
+    $warning_net.Popup("O computador não possui o módulo Powershell Active Directory, ou não possui o Active Directory instalado.",0,"Aviso!",0x0)
+}
 }
 AD_Explorer
-
-
-
-<#iae
-Quem fez foi BJBD. 
-Ele fez com o objetivo de facilitar a busca de grupos de acesso a pastas de rede.#>
