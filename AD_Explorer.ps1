@@ -2,10 +2,10 @@ $ErrorActionPreference = "SilentlyContinue"
 
 function txt {
     $user = $TextBoxID.text
-    $file = (Get-ADUser $user -Properties MemberOf -ErrorVariable erro2).MemberOf | Get-ADGroup -Properties Name, Description | Select-Object Name, Description
-    $username = Get-ADUser $user -Properties Name, DisplayName | Select-Object Name, Displayname
+    $username = Get-ADUser $user -Properties Name, DisplayName -ErrorVariable erro2 | Select-Object Name, Displayname
 
     if ($erro2) {
+        Start-Sleep -s 1
         $LabelError.Visible = $true
         Start-Sleep -s 2
         $LabelError.Visible = $false
@@ -13,6 +13,8 @@ function txt {
     
     else { 
         function txt_data {
+            $LabelProcessing.Visible = $true ; Start-Sleep -s 2
+            $file = (Get-ADUser $user -Properties MemberOf -ErrorVariable erro2).MemberOf | Get-ADGroup -Properties Name, Description | Select-Object Name, Description
             $username | Out-File "$Env:USERPROFILE\Documents\AD_$user.txt"
             $file | Add-Content "$Env:USERPROFILE\Documents\AD_$user.txt"
             $date = get-date -format "dddd, dd/MM/yyyy, HH:mm:ss"
@@ -20,10 +22,10 @@ function txt {
             (Get-Content "$Env:USERPROFILE\Documents\AD_$user.txt" -Raw) -replace '}', '' | Out-file "$Env:USERPROFILE\Documents\AD_$user.txt"
             $date | Add-Content "$Env:USERPROFILE\Documents\AD_$user.txt" 
             Invoke-Expression "$Env:USERPROFILE\Documents\AD_$user.txt"
+            $LabelProcessing.Visible = $false
             Start-Sleep -s 1 }  
         }
-        do {Start-Export} while (txt_data)
-        $LabelProcessing.Visible = $false
+        txt_data
 }
 
 function grid {
@@ -367,7 +369,7 @@ $ButtonConfirm.Add_Click({
 
 $AboutStripMenuItem.Add_Click({
     $sobre = New-Object -ComObject Wscript.Shell
-    $sobre.Popup("Versão: 2.1`nDesenvolvido por: github.com/vpessanha",0,"Sobre AD Explorer",0x0)
+    $sobre.Popup("Versão: 2.1`nDesenvolvido por: gitlab.com/vpess",0,"Sobre AD Explorer",0x0)
 })
 
 
@@ -395,7 +397,7 @@ if (Get-Module -ListAvailable -Name ActiveDirectory) {
 } 
 else {
     $warning_net = New-Object -ComObject Wscript.Shell
-    $warning_net.Popup("O computador não possui o módulo Powershell Active Directory, ou não possui o Active Directory instalado.",0,"Aviso!",0x0)
+    $warning_net.Popup("O computador não possui o módulo Active Directory para Powershell, ou não possui o Active Directory instalado.",0,"Aviso!",0x0)
 }
 }
 AD_Explorer
