@@ -2,7 +2,7 @@ $ErrorActionPreference = "SilentlyContinue"
 
 function txt {
     $user = $TextBoxID.text
-    $username = Get-ADUser $user -Properties Name, DisplayName -ErrorVariable erro2 | Select-Object Name, Displayname
+    $username = (Get-ADUser $user -Properties Name, DisplayName -ErrorVariable erro2).DisplayName
 
     if ($erro2) {
         Start-Sleep -s 1
@@ -15,11 +15,12 @@ function txt {
         function txt_data {
             $LabelProcessing.Visible = $true ; Start-Sleep -s 2
             $file = (Get-ADUser $user -Properties MemberOf -ErrorVariable erro2).MemberOf | Get-ADGroup -Properties Name, Description | Select-Object Name, Description
-            $username | Out-File "$Env:USERPROFILE\Documents\AD_$user.txt"
+            "Nome: $username`nID: $user`n" | Out-File "$Env:USERPROFILE\Documents\AD_$user.txt"
             $file | Add-Content "$Env:USERPROFILE\Documents\AD_$user.txt"
             $date = get-date -format "dddd, dd/MM/yyyy, HH:mm:ss"
             (Get-Content "$Env:USERPROFILE\Documents\AD_$user.txt" -Raw) -replace '@{', '' | Out-file "$Env:USERPROFILE\Documents\AD_$user.txt"
             (Get-Content "$Env:USERPROFILE\Documents\AD_$user.txt" -Raw) -replace '}', '' | Out-file "$Env:USERPROFILE\Documents\AD_$user.txt"
+            (Get-Content "$Env:USERPROFILE\Documents\AD_$user.txt" -Raw) -replace ';', '   ' | Out-file "$Env:USERPROFILE\Documents\AD_$user.txt"
             $date | Add-Content "$Env:USERPROFILE\Documents\AD_$user.txt" 
             Invoke-Expression "$Env:USERPROFILE\Documents\AD_$user.txt"
             $LabelProcessing.Visible = $false
@@ -292,11 +293,11 @@ $LabelExplorer.location          = New-Object System.Drawing.Point(211,30)
 $LabelExplorer.Font              = New-Object System.Drawing.Font('Microsoft YaHei UI',12)
 
 $LabelUser                       = New-Object system.Windows.Forms.Label
-$LabelUser.text                  = "Digite a chave do usuário"
+$LabelUser.text                  = "Digite o ID do usuário"
 $LabelUser.AutoSize              = $true
 $LabelUser.width                 = 25
 $LabelUser.height                = 10
-$LabelUser.location              = New-Object System.Drawing.Point(26,150)
+$LabelUser.location              = New-Object System.Drawing.Point(35,150)
 $LabelUser.Font                  = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $LabelInfo                       = New-Object system.Windows.Forms.Label
