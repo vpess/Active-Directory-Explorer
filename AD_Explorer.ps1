@@ -119,7 +119,7 @@ function csv {
 
     else {
         function csv_data {
-        $file | Export-CSV -Delimiter ';' -Path "$Env:USERPROFILE\Documents\AD_$user.csv" -NoTypeInformation | Format-Table
+        $file | Export-CSV -Path "$Env:USERPROFILE\Documents\AD_$user.csv" -NoTypeInformation | Format-Table
         $date = get-date -format "dddd, dd/MM/yyyy, HH:mm:ss" ; $date | Add-Content "$Env:USERPROFILE\Documents\AD_$user.csv"
         $username | Add-Content "$Env:USERPROFILE\Documents\AD_$user.csv"
         Save-CSVasExcel "$Env:USERPROFILE\Documents\AD_$user.csv"
@@ -132,6 +132,7 @@ function csv {
     }
     
 }
+
 
 
 ############################################# 
@@ -369,7 +370,7 @@ $ButtonConfirm.Add_Click({
 
 $AboutStripMenuItem.Add_Click({
     $sobre = New-Object -ComObject Wscript.Shell
-    $sobre.Popup("Versão: 2.1`nDesenvolvido por: gitlab.com/vpess",0,"Sobre AD Explorer",0x0)
+    $sobre.Popup("Versão: 2.2`nDesenvolvido por: gitlab.com/vpess",0,"Sobre AD Explorer",0x0)
 })
 
 
