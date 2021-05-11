@@ -10,8 +10,7 @@ Written with [PoshGUI](https://poshgui.com) and [Visual Studio Code](https://cod
 
 Prerequisite: Active Directory (RSAT) installed on a Windows system.
 
-
-
+#
 
 #### PT-BR 🇧🇷:
 
