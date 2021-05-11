@@ -8,7 +8,7 @@ Grants an easier and complete visualization of Active Directory access groups, a
 
 Written with [PoshGUI](https://poshgui.com) and [Visual Studio Code](https://code.visualstudio.com/).
 
-Prerequisite: Active Directory (RSAT) installed on a Windows system.
+**Prerequisite**: [Active Directory (RSAT)](https://www.microsoft.com/en-us/download/details.aspx?id=45520) installed on a Windows system.
 
 #
 
@@ -20,4 +20,4 @@ Permite a visualização dos dados de forma mais simples, além da emissão de u
 
 Ferramentas utilizadas no desenvolvimento: [PoshGUI](https://poshgui.com) e [Visual Studio Code](https://code.visualstudio.com/).
 
-Pré requisito: Active Directory (RSAT) instalado no sistema operacional Windows.
+**Pré requisito**: [Active Directory (RSAT)](https://www.microsoft.com/pt-br/download/details.aspx?id=45520) instalado no sistema operacional Windows.
